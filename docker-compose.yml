@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   debug:
-    container_name: salary-debug-app
+    container_name: debug-app
     build:
       context: .
       dockerfile: docker/Dockerfile-local
@@ -18,7 +18,7 @@ services:
       - .:/app
 
   app:
-    container_name: salary-app
+    container_name: app
     build:
       context: .
       dockerfile: docker/Dockerfile-local
@@ -33,7 +33,7 @@ services:
 
   app_db:
     image: postgres:14.8-alpine
-    container_name: salary-postgres
+    container_name: postgres
     environment:
       POSTGRES_DB: "local"
       POSTGRES_USER: "web"
@@ -44,13 +44,13 @@ services:
   redis:
     image: redis:6.2
     restart: always
-    container_name: salary-redis
+    container_name: redis
     command: redis-server --requirepass Wmx4pqVcR14zOr8K
     ports:
       - '6379:6379'
 
   commander:
-    container_name: salary-redis-commander
+    container_name: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
       - REDIS_HOST=redis
