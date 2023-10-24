@@ -1,0 +1,64 @@
+version: "3.4"
+
+services:
+  debug:
+    container_name: salary-debug-app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-local
+      target: debug
+    depends_on:
+      - app_db
+      - commander
+      - redis
+    ports:
+      - "80:8080"
+      - "2345:2345"
+    volumes:
+      - .:/app
+
+  app:
+    container_name: salary-app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-local
+      target: production
+    depends_on:
+      - app_db
+      - redis
+    ports:
+      - "80:8080"
+    volumes:
+      - ./migrations:/app/migrations
+
+  app_db:
+    image: postgres:14.8-alpine
+    container_name: salary-postgres
+    environment:
+      POSTGRES_DB: "local"
+      POSTGRES_USER: "web"
+      POSTGRES_PASSWORD: "web"
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6.2
+    restart: always
+    container_name: salary-redis
+    command: redis-server --requirepass Wmx4pqVcR14zOr8K
+    ports:
+      - '6379:6379'
+
+  commander:
+    container_name: salary-redis-commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=Wmx4pqVcR14zOr8K
+    ports:
+      - '8081:8081'
+    depends_on:
+      - "redis"
+
+volumes:
+  app_db:
